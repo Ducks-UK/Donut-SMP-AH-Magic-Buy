@@ -1,5 +1,5 @@
 name: Build Auction Sniper Mod
-on: [push, workflow_dispatch]  # Runs on push or manual trigger
+on: [push, workflow_dispatch]
 
 jobs:
   build:
