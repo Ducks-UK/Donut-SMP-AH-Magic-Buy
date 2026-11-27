@@ -1,11 +1,12 @@
 plugins {
-    id 'fabric-loom' version '1.6-SNAPSHOT'
+    id 'fabric-loom' version '1.5.10' // Stable version that works
     id 'maven-publish'
 }
 
 repositories {
     mavenCentral()
     maven { url 'https://maven.fabricmc.net/' }
+    maven { url 'https://maven.architectury.dev/' }
 }
 
 dependencies {
