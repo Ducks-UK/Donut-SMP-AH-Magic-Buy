@@ -2,21 +2,17 @@
   "schemaVersion": 1,
   "id": "auctionsniper",
   "version": "1.0.0",
-  "name": "DonutSMP Auction Sniper",
-  "description": "Advanced auction sniper with GUI and smart filtering",
+  "name": "Auction Sniper",
+  "description": "A mod for DonutSMP auction sniping",
   "authors": ["YourName"],
-  "license": "ARR",
-  "environment": "client",
+  "license": "MIT",
+  "environment": "*",
   "entrypoints": {
-    "main": ["com.example.auctionsniper.AuctionSniperMod"]
+    "main": ["com.yourpackage.AuctionSniperMod"]
   },
   "depends": {
-    "fabricloader": ">=0.15.0",
+    "fabricloader": ">=0.15.11",
     "fabric-api": "*",
-    "minecraft": "1.21.4",
-    "ahcharts": "*"
-  },
-  "suggests": {
-    "modmenu": "*"
+    "minecraft": "1.21.4"
   }
 }
