@@ -3,62 +3,42 @@ package com.example.auctionsniper;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 
 public class AuctionSniperMod implements ClientModInitializer {
-    public static final String MOD_ID = "auctionsniper";
+    public static final String MOD_ID = "auction-sniper-mod";
     private static AuctionSniperConfig config;
-    private static boolean isRunning = false;
-    private static KeyBinding toggleKey;
+    private static AuctionScanner scanner;
     private static KeyBinding configKey;
-    private static AuctionSniperScreen configScreen;
+    private static KeyBinding toggleKey;
 
     @Override
     public void onInitializeClient() {
-        config = AuctionSniperConfig.load();
-
-        toggleKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.auctionsniper.toggle",
-                InputUtil.Type.KEYSYM,
-                GLFW.GLFW_KEY_UNKNOWN,
-                "category.auctionsniper.title"
-        ));
+        config = new AuctionSniperConfig();
+        scanner = new AuctionScanner(config);
 
         configKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.auctionsniper.config",
-                InputUtil.Type.KEYSYM,
-                GLFW.GLFW_KEY_P,
-                "category.auctionsniper.title"
+            "key.auction-sniper.config",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_P,
+            "category.auction-sniper"
         ));
 
-        ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
-            if (configKey.wasPressed()) {
-                if (configScreen == null) {
-                    configScreen = new AuctionSniperScreen(Text.literal("Auction Sniper Config"));
-                }
-                client.setScreen(configScreen);
-            }
-        });
+        toggleKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+            "key.auction-sniper.toggle",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_UNKNOWN,
+            "category.auction-sniper"
+        ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (toggleKey.wasPressed()) {
-                isRunning = !isRunning;
-                if (client.player != null) {
-                    client.player.sendMessage(
-                            isRunning ?
-                                    Text.translatable("message.auctionsniper.started") :
-                                    Text.translatable("message.auctionsniper.stopped"),
-                            false
-                    );
-                }
+            if (configKey.wasPressed()) {
+                client.setScreen(new AuctionSniperScreen(config));
             }
-
-            if (isRunning && AuctionHouseHelper.isAuctionHouseOpen()) {
-                AuctionScanner.scan();
+            if (toggleKey.wasPressed()) {
+                scanner.toggleSniper();
             }
         });
     }
@@ -67,11 +47,7 @@ public class AuctionSniperMod implements ClientModInitializer {
         return config;
     }
 
-    public static boolean isRunning() {
-        return isRunning;
-    }
-
-    public static void saveConfig() {
-        AuctionSniperConfig.save(config);
+    public static AuctionScanner getScanner() {
+        return scanner;
     }
 }
