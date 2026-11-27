@@ -13,6 +13,8 @@ import java.util.List;
 
 public class AuctionSniperConfig {
     private List<AutionItem> targetItems = new ArrayList<>();
+    private List<String> blacklistedItems = new ArrayList<>();
+    private List<String> whitelistedItems = new ArrayList<>();
     private long maxPrice = 0;
     private long minProfit = 1000;
     private long maxSpend = 1000000000;
@@ -20,6 +22,7 @@ public class AuctionSniperConfig {
     private boolean autoEnableQuickBuy = false;
     private boolean enableAntiTroll = true;
     private double trollThreshold = 1000.0;
+    private double sellAtPercent = 0.9; // 90% of average price
 
     public static class AutionItem {
         public String itemId;
@@ -67,6 +70,10 @@ public class AuctionSniperConfig {
     // Getters and setters
     public List<AutionItem> getTargetItems() { return targetItems; }
     public void setTargetItems(List<AutionItem> targetItems) { this.targetItems = targetItems; }
+    public List<String> getBlacklistedItems() { return blacklistedItems; }
+    public void setBlacklistedItems(List<String> blacklistedItems) { this.blacklistedItems = blacklistedItems; }
+    public List<String> getWhitelistedItems() { return whitelistedItems; }
+    public void setWhitelistedItems(List<String> whitelistedItems) { this.whitelistedItems = whitelistedItems; }
     public long getMaxPrice() { return maxPrice; }
     public void setMaxPrice(long maxPrice) { this.maxPrice = maxPrice; }
     public long getMinProfit() { return minProfit; }
@@ -83,4 +90,6 @@ public class AuctionSniperConfig {
     public void setEnableAntiTroll(boolean enableAntiTroll) { this.enableAntiTroll = enableAntiTroll; }
     public double getTrollThreshold() { return trollThreshold; }
     public void setTrollThreshold(double trollThreshold) { this.trollThreshold = trollThreshold; }
+    public double getSellAtPercent() { return sellAtPercent; }
+    public void setSellAtPercent(double sellAtPercent) { this.sellAtPercent = sellAtPercent; }
 }
