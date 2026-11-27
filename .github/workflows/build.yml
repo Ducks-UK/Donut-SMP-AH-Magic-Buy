@@ -14,11 +14,16 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Make gradlew executable
-        run: chmod +x gradlew
+      - name: Download Fabric Loom (Gradle plugin)
+        run: |
+          mkdir -p ~/.gradle/plugins
+          curl -L https://maven.fabricmc.net/net/fabricmc/loom/net.fabricmc.loom.gradle.plugin/1.6-SNAPSHOT/net.fabricmc.loom.gradle.plugin-1.6-SNAPSHOT.jar -o ~/.gradle/plugins/net.fabricmc.loom.gradle.plugin-1.6-SNAPSHOT.jar
 
-      - name: Build with Gradle
-        run: ./gradlew build
+      - name: Build with Gradle (no local gradlew)
+        run: |
+          ./gradlew build || gradle build
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
