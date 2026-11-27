@@ -1,18 +1,23 @@
 {
   "schemaVersion": 1,
-  "id": "auctionsniper",
+  "id": "auction-sniper-mod",
   "version": "1.0.0",
-  "name": "Auction Sniper",
-  "description": "A mod for DonutSMP auction sniping",
+  "name": "Auction Sniper Mod",
+  "description": "Automated auction house sniper for DonutSMP",
   "authors": ["YourName"],
   "license": "MIT",
-  "environment": "*",
+  "environment": "client",
   "entrypoints": {
-    "main": ["com.yourpackage.AuctionSniperMod"]
+    "main": ["com.example.auctionsniper.AuctionSniperMod"]
   },
+  "mixins": ["auction-sniper.mixins.json"],
   "depends": {
-    "fabricloader": ">=0.15.11",
+    "fabricloader": ">=0.14.22",
     "fabric-api": "*",
-    "minecraft": "1.21.4"
+    "minecraft": "1.20.4",
+    "ahcharts": "1.8.2-26.2"
+  },
+  "suggests": {
+    "other-mod": "*"
   }
 }
