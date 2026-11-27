@@ -1,0 +1,16 @@
+{
+  "key.auctionsniper.toggle": "Toggle Auction Sniper",
+  "category.auctionsniper.title": "Auction Sniper",
+  "message.auctionsniper.started": "Auction Sniper started!",
+  "message.auctionsniper.stopped": "Auction Sniper stopped!",
+  "message.auctionsniper.purchased": "Purchased %s for $%d",
+  "message.auctionsniper.troll_blocked": "Blocked troll listing: %s",
+  "message.auctionsniper.profit_too_low": "Profit too low for %s (need $%d more)",
+  "message.auctionsniper.spend_limit_reached": "Spend limit reached!",
+  "message.auctionsniper.speed_limit_reached": "Speed limit reached! Waiting before next purchase",
+  "config.auctionsniper.min_profit": "Minimum Profit",
+  "config.auctionsniper.max_spend": "Maximum Spend",
+  "config.auctionsniper.purchases_per_minute": "Purchases per Minute",
+  "config.auctionsniper.anti_troll": "Enable Anti-Troll Filter",
+  "config.auctionsniper.troll_threshold": "Troll Price Multiplier"
+}
