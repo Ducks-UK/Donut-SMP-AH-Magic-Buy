@@ -3,7 +3,7 @@
   "id": "auctionsniper",
   "version": "1.0.0",
   "name": "DonutSMP Auction Sniper",
-  "description": "Automatically buys cheap items on DonutSMP auction house",
+  "description": "Advanced auction sniper with GUI and smart filtering",
   "authors": ["YourName"],
   "license": "ARR",
   "environment": "client",
