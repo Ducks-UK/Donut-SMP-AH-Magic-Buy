@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.6-SNAPSHOT' // Use latest snapshot
+    id 'fabric-loom' version '1.6-SNAPSHOT' // Correct for Fabric 26.2
     id 'maven-publish'
 }
 
@@ -12,8 +12,8 @@ repositories {
 dependencies {
     minecraft "com.mojang:minecraft:1.21.4"
     mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:0.15.11"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:0.97.8+1.21.4"
+    modImplementation "net.fabricmc:fabric-loader:0.15.11" // Fabric 26.2 uses 0.15.11
+    modImplementation "net.fabricmc.fabric-api:fabric-api:0.97.8+1.21.4" // Fabric API 0.97.8
     include(implementation('org.jetbrains:annotations:24.1.0'))
 }
 
