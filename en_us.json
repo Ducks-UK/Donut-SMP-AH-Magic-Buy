@@ -1,5 +1,6 @@
 {
   "key.auctionsniper.toggle": "Toggle Auction Sniper",
+  "key.auctionsniper.config": "Open Auction Sniper Config",
   "category.auctionsniper.title": "Auction Sniper",
   "message.auctionsniper.started": "Auction Sniper started!",
   "message.auctionsniper.stopped": "Auction Sniper stopped!",
@@ -12,5 +13,6 @@
   "config.auctionsniper.max_spend": "Maximum Spend",
   "config.auctionsniper.purchases_per_minute": "Purchases per Minute",
   "config.auctionsniper.anti_troll": "Enable Anti-Troll Filter",
-  "config.auctionsniper.troll_threshold": "Troll Price Multiplier"
+  "config.auctionsniper.troll_threshold": "Troll Price Multiplier",
+  "config.auctionsniper.sell_at_percent": "Sell at % of Average Price"
 }
