@@ -1,0 +1,44 @@
+plugins {
+    id 'fabric-loom' version '1.6-SNAPSHOT'
+    id 'maven-publish'
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://maven.fabricmc.net/' }
+    maven { url 'https://jitpack.io' } // For ahcharts dependency
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:1.21.4"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:0.15.11"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:0.97.8+1.21.4"
+    modImplementation "com.github.Devs-For-Forge:ahcharts-1.8.2-26.2:1.0.0" // ahcharts dependency
+    include(implementation('org.jetbrains:annotations:24.1.0'))
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mod_id", project.mod_id
+
+    filesMatching("fabric.mod.json") {
+        filter { it.replace("%version%", project.version).replace("%mod_id%", project.mod_id) }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.release = 21
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+        }
+    }
+}
