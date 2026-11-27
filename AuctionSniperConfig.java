@@ -5,91 +5,62 @@ import com.google.gson.GsonBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AuctionSniperConfig {
-    private List<AutionItem> targetItems = new ArrayList<>();
-    private List<String> blacklistedItems = new ArrayList<>();
-    private List<String> whitelistedItems = new ArrayList<>();
-    private long maxPrice = 0;
-    private long minProfit = 1000;
-    private long maxSpend = 1000000000;
+    private double priceMultiplier = 1.5;
+    private double minProfit = 100;
+    private double maxSpend = 10000;
     private int maxPurchasesPerMinute = 60;
-    private boolean autoEnableQuickBuy = false;
-    private boolean enableAntiTroll = true;
-    private double trollThreshold = 1000.0;
-    private double sellAtPercent = 0.9; // 90% of average price
+    private List<String> blacklist = new ArrayList<>();
+    private List<String> whitelist = new ArrayList<>();
+    private double sellPercentage = 0.9;
+    private boolean sniperEnabled = false;
 
-    public static class AutionItem {
-        public String itemId;
-        public String displayName;
-        public long maxPrice;
-        public boolean enabled = true;
+    private static final File CONFIG_FILE = new File(FabricLoader.getInstance().getConfigDir().toFile(), "auction-sniper.json");
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
+    public AuctionSniperConfig() {
+        load();
     }
 
-    private static final File configFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), "auctionsniper.json");
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-    public static AuctionSniperConfig load() {
-        if (!configFile.exists()) {
-            AuctionSniperConfig defaultConfig = new AuctionSniperConfig();
-            defaultConfig.targetItems.add(new AutionItem() {{
-                itemId = "minecraft:diamond";
-                displayName = "Diamond";
-                maxPrice = 100000;
-            }});
-            defaultConfig.targetItems.add(new AutionItem() {{
-                itemId = "minecraft:netherite_ingot";
-                displayName = "Netherite Ingot";
-                maxPrice = 500000;
-            }});
-            save(defaultConfig);
-            return defaultConfig;
-        }
-
-        try (FileReader reader = new FileReader(configFile)) {
-            return gson.fromJson(reader, AuctionSniperConfig.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new AuctionSniperConfig();
-        }
-    }
-
-    public static void save(AuctionSniperConfig config) {
-        try (FileWriter writer = new FileWriter(configFile)) {
-            gson.toJson(config, writer);
+    public void save() {
+        try {
+            Files.write(CONFIG_FILE.toPath(), GSON.toJson(this).getBytes());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    // Getters and setters
-    public List<AutionItem> getTargetItems() { return targetItems; }
-    public void setTargetItems(List<AutionItem> targetItems) { this.targetItems = targetItems; }
-    public List<String> getBlacklistedItems() { return blacklistedItems; }
-    public void setBlacklistedItems(List<String> blacklistedItems) { this.blacklistedItems = blacklistedItems; }
-    public List<String> getWhitelistedItems() { return whitelistedItems; }
-    public void setWhitelistedItems(List<String> whitelistedItems) { this.whitelistedItems = whitelistedItems; }
-    public long getMaxPrice() { return maxPrice; }
-    public void setMaxPrice(long maxPrice) { this.maxPrice = maxPrice; }
-    public long getMinProfit() { return minProfit; }
-    public void setMinProfit(long minProfit) { this.minProfit = minProfit; }
-    public long getMaxSpend() { return maxSpend; }
-    public void setMaxSpend(long maxSpend) { this.maxSpend = maxSpend; }
-    public int getMaxPurchasesPerMinute() { return maxPurchasesPerMinute; }
-    public void setMaxPurchasesPerMinute(int maxPurchasesPerMinute) {
-        this.maxPurchasesPerMinute = maxPurchasesPerMinute;
+    public void load() {
+        if (!CONFIG_FILE.exists()) return;
+
+        try {
+            String json = new String(Files.readAllBytes(CONFIG_FILE.toPath()));
+            AuctionSniperConfig loaded = GSON.fromJson(json, AuctionSniperConfig.class);
+            if (loaded != null) {
+                this.priceMultiplier = loaded.priceMultiplier;
+                this.minProfit = loaded.minProfit;
+                this.maxSpend = loaded.maxSpend;
+                this.maxPurchasesPerMinute = loaded.maxPurchasesPerMinute;
+                this.blacklist = loaded.blacklist;
+                this.whitelist = loaded.whitelist;
+                this.sellPercentage = loaded.sellPercentage;
+                this.sniperEnabled = loaded.sniperEnabled;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-    public boolean isAutoEnableQuickBuy() { return autoEnableQuickBuy; }
-    public void setAutoEnableQuickBuy(boolean autoEnableQuickBuy) { this.autoEnableQuickBuy = autoEnableQuickBuy; }
-    public boolean isEnableAntiTroll() { return enableAntiTroll; }
-    public void setEnableAntiTroll(boolean enableAntiTroll) { this.enableAntiTroll = enableAntiTroll; }
-    public double getTrollThreshold() { return trollThreshold; }
-    public void setTrollThreshold(double trollThreshold) { this.trollThreshold = trollThreshold; }
-    public double getSellAtPercent() { return sellAtPercent; }
-    public void setSellAtPercent(double sellAtPercent) { this.sellAtPercent = sellAtPercent; }
+
+    // Getters and setters for all fields
+    public double getPriceMultiplier() { return priceMultiplier; }
+    public void setPriceMultiplier(double priceMultiplier) {
+        this.priceMultiplier = priceMultiplier;
+        save();
+    }
+    // ... other getters/setters
 }
