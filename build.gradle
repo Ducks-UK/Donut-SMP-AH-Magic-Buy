@@ -1,12 +1,11 @@
 plugins {
-    id 'fabric-loom' version '1.6-SNAPSHOT'
+    id 'fabric-loom' version '1.5.10'  // Stable version instead of SNAPSHOT
     id 'maven-publish'
 }
 
 repositories {
     mavenCentral()
-    maven { url 'https://maven.fabricmc.net/' }
-    maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.fabricmc.net/' }  // Fabric's Maven repo
 }
 
 dependencies {
@@ -14,21 +13,21 @@ dependencies {
     mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:0.15.11"
     modImplementation "net.fabricmc.fabric-api:fabric-api:0.97.8+1.21.4"
-    modImplementation "com.github.Devs-For-Forge:ahcharts-1.8.2-26.2:1.0.0"
     include(implementation('org.jetbrains:annotations:24.1.0'))
-    include(implementation('com.google.code.gson:gson:2.10.1'))
+}
+
+loom {
+    accessWidenerPath = file("src/main/resources/auctionsniper.accesswidener")
 }
 
 processResources {
     inputs.property "version", project.version
-    inputs.property "mod_id", project.mod_id
-
     filesMatching("fabric.mod.json") {
-        filter { it.replace("%version%", project.version).replace("%mod_id%", project.mod_id) }
+        filter { it.replace("%VERSION%", project.version) }
     }
 }
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.release = 21
 }
 
@@ -36,10 +35,8 @@ java {
     toolchain.languageVersion = JavaLanguageVersion.of(21)
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifact jar
-        }
+jar {
+    from("LICENSE") {
+        into ""
     }
 }
