@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "auctionsniper",
+  "version": "1.0.0",
+  "name": "DonutSMP Auction Sniper",
+  "description": "Automatically buys cheap items on DonutSMP auction house",
+  "authors": ["YourName"],
+  "license": "ARR",
+  "environment": "client",
+  "entrypoints": {
+    "main": ["com.example.auctionsniper.AuctionSniperMod"]
+  },
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "fabric-api": "*",
+    "minecraft": "1.21.4",
+    "ahcharts": "*"
+  },
+  "suggests": {
+    "modmenu": "*"
+  }
+}
