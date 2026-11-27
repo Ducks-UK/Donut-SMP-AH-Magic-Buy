@@ -11,6 +11,7 @@ public class AuctionScanner {
     private static final AtomicLong totalSpent = new AtomicLong(0);
     private static int purchaseCount = 0;
     private static long lastResetTime = System.currentTimeMillis();
+    private static final Map<String, Long> averagePrices = new HashMap<>();
 
     public static void scan() {
         MinecraftClient client = MinecraftClient.getInstance();
@@ -34,6 +35,8 @@ public class AuctionScanner {
         if (listings.isEmpty()) return;
 
         listings.stream()
+            .filter(listing -> !isBlacklisted(listing))
+            .filter(listing -> isWhitelisted(listing) || config.getWhitelistedItems().isEmpty())
             .filter(listing -> !isTrollListing(listing, config))
             .filter(listing -> matchesTargetItem(listing, config.getTargetItems()))
             .filter(listing -> passesProfitCheck(listing, config))
@@ -41,20 +44,34 @@ public class AuctionScanner {
             .filter(listing -> passesSpeedLimit(listing))
             .min(Comparator.comparingLong(AuctionListing::getPrice))
             .ifPresent(listing -> {
-                AuctionHouseHelper.purchaseItem(listing.getSlotId());
                 long price = listing.getPrice();
-                totalSpent.addAndGet(price);
-                lastPurchaseTimes.put(listing.getItemId(), System.currentTimeMillis());
-                purchaseCount++;
+                long sellPrice = (long) (getAveragePrice(listing.getItemId()) * config.getSellAtPercent());
 
-                if (client.player != null) {
-                    client.player.sendMessage(
-                        Text.translatable("message.auctionsniper.purchased",
-                            listing.getItemStack().getName(), price),
-                        false
-                    );
+                if (sellPrice > 0 && price < sellPrice) {
+                    AuctionHouseHelper.purchaseItem(listing.getSlotId());
+                    totalSpent.addAndGet(price);
+                    lastPurchaseTimes.put(listing.getItemId(), System.currentTimeMillis());
+                    purchaseCount++;
+
+                    if (client.player != null) {
+                        client.player.sendMessage(
+                            Text.translatable("message.auctionsniper.purchased",
+                                listing.getItemStack().getName(), price),
+                            false
+                        );
+                    }
                 }
             });
+    }
+
+    private static boolean isBlacklisted(AuctionListing listing) {
+        AuctionSniperConfig config = AuctionSniperMod.getConfig();
+        return config.getBlacklistedItems().contains(listing.getItemId());
+    }
+
+    private static boolean isWhitelisted(AuctionListing listing) {
+        AuctionSniperConfig config = AuctionSniperMod.getConfig();
+        return config.getWhitelistedItems().contains(listing.getItemId());
     }
 
     private static boolean isTrollListing(AuctionListing listing, AuctionSniperConfig config) {
@@ -63,7 +80,6 @@ public class AuctionScanner {
         String itemId = listing.getItemId();
         long price = listing.getPrice();
 
-        // Check for obviously troll items (dirt, cobblestone, etc. with insane prices)
         if (itemId.contains("dirt") || itemId.contains("cobblestone") || itemId.contains("stone")) {
             double priceMultiplier = (double) price / getBaseValue(itemId);
             if (priceMultiplier > config.getTrollThreshold()) {
@@ -89,73 +105,5 @@ public class AuctionScanner {
         }
     }
 
-    private static boolean passesProfitCheck(AuctionListing listing, AuctionSniperConfig config) {
-        long resaleValue = getResaleValue(listing.getItemStack());
-        long profit = resaleValue - listing.getPrice();
-
-        if (profit < config.getMinProfit()) {
-            if (MinecraftClient.getInstance().player != null) {
-                MinecraftClient.getInstance().player.sendMessage(
-                    Text.translatable("message.auctionsniper.profit_too_low",
-                        listing.getItemStack().getName(), config.getMinProfit() - profit),
-                    false
-                );
-            }
-            return false;
-        }
-        return true;
-    }
-
-    private static boolean passesSpendLimit(AuctionListing listing, AuctionSniperConfig config) {
-        if ((totalSpent.get() + listing.getPrice()) > config.getMaxSpend()) {
-            if (MinecraftClient.getInstance().player != null) {
-                MinecraftClient.getInstance().player.sendMessage(
-                    Text.translatable("message.auctionsniper.spend_limit_reached"),
-                    false
-                );
-            }
-            return false;
-        }
-        return true;
-    }
-
-    private static boolean passesSpeedLimit(AuctionListing listing) {
-        String itemId = listing.getItemId();
-        Long lastPurchaseTime = lastPurchaseTimes.get(itemId);
-
-        if (lastPurchaseTime == null) return true;
-
-        long timeSinceLastPurchase = System.currentTimeMillis() - lastPurchaseTime;
-        AuctionSniperConfig config = AuctionSniperMod.getConfig();
-        long minTimeBetweenPurchases = 60000 / config.getMaxPurchasesPerMinute();
-
-        if (timeSinceLastPurchase < minTimeBetweenPurchases) {
-            return false;
-        }
-        return true;
-    }
-
-    private static long getResaleValue(ItemStack stack) {
-        if (stack == null) return 0;
-
-        String itemId = stack.getItem().toString();
-        switch (itemId) {
-            case "minecraft:diamond": return 100000;
-            case "minecraft:netherite_ingot": return 500000;
-            default: return 0;
-        }
-    }
-
-    private static boolean matchesTargetItem(AuctionListing listing, List<AuctionSniperConfig.AutionItem> targetItems) {
-        String itemId = listing.getItemId();
-        String displayName = listing.getItemStack().getName().getString();
-
-        return targetItems.stream()
-            .filter(item -> item.enabled)
-            .anyMatch(item ->
-                (item.itemId == null || item.itemId.equals(itemId)) &&
-                (item.displayName == null || displayName.contains(item.displayName)) &&
-                listing.getPrice() <= item.maxPrice
-            );
-    }
-}
+    private static long getAveragePrice(String itemId) {
+        return averagePrices.getOrDefault
